@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ផ្ទៀងផ្ទាត់ QR Code</title>
+    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Hanuman:wght@100;300;400;700;900&display=swap" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <!-- QR Scanner -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <!-- Sweet Alert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Custom CSS and JS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ផ្ទៀងផ្ទាត់ QR Code</h1>
+        <div id="qr-reader"></div>
+        <div class="loading">
+            <div class="loading-spinner"></div>
+            <p>កំពុងផ្ទៀងផ្ទាត់...</p>
+        </div>
+        <div class="error-message"></div>
+        <div id="result"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
