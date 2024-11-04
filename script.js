@@ -12,48 +12,59 @@ const firebaseConfig = {
         // Google Sheets Web App URL
         const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbwrx2r016GHBiQMK8lf7FbgjLhRktH6LBID9YdfWdB4b3yrCkteheL3DQzGYMC6UrsK3Q/exec';
 
-        // Initialize Firebase
-        let db;
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log('Firebase initialized successfully');
-        } catch (error) {
-            console.error('Error initializing Firebase:', error);
-            showError('មិនអាចភ្ជាប់ទៅកាន់មូលដ្ឋានទិន្នន័យបានទេ');
-        }
+// Initialize QR Scanner
+let html5QrcodeScanner;
 
-        // Initialize QR Scanner
-        const html5QrcodeScanner = new Html5QrcodeScanner(
-            "qr-reader",
-            { 
-                fps: 10, 
-                qrbox: { width: 250, height: 250 },
-                rememberLastUsedCamera: true,
-                aspectRatio: 1.0
-            }
-        );
-
-        // QR Code Success Handler
-        async function onScanSuccess(decodedText) {
-            try {
-                const qrData = JSON.parse(decodedText);
-                if (!qrData.documentId || !qrData.name || !qrData.phone) {
-                    throw new Error('QR code មិនមានទិន្នន័យគ្រប់គ្រាន់');
-                }
-                await verifyRegistration(qrData);
-            } catch (error) {
-                showError('QR code មិនត្រឹមត្រូវ។ សូមព្យាយាមម្តងទៀត។');
-            }
+document.addEventListener('DOMContentLoaded', () => {
+    html5QrcodeScanner = new Html5QrcodeScanner(
+        "qr-reader",
+        { 
+            fps: 10, 
+            qrbox: { width: 250, height: 250 },
+            rememberLastUsedCamera: true,
+            aspectRatio: 1.0
         }
+    );
 
-        // QR Code Error Handler
-        function onScanError(error) {
-            console.warn('Scan error:', error);
-            if (error.includes('NotFound')) {
-                showError('រកមិនឃើញកាមេរ៉ា។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក។');
-            }
+    // Start Scanner
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
+});
+
+// QR Code Success Handler
+async function onScanSuccess(decodedText) {
+    try {
+        // Stop the scanner immediately
+        await html5QrcodeScanner.clear();
+        
+        const qrData = JSON.parse(decodedText);
+        if (!qrData.documentId || !qrData.name || !qrData.phone) {
+            throw new Error('QR code មិនមានទិន្នន័យគ្រប់គ្រាន់');
         }
+        await verifyRegistration(qrData);
+        
+        // Add a restart button or automatic restart after a delay if needed
+        setTimeout(() => {
+            restartScanner();
+        }, 5000); // Restart after 5 seconds
+    } catch (error) {
+        showError('QR code មិនត្រឹមត្រូវ។ សូមព្យាយាមម្តងទៀត។');
+        // Restart scanner if there was an error
+        restartScanner();
+    }
+}
+
+// Function to restart the scanner
+function restartScanner() {
+    html5QrcodeScanner.render(onScanSuccess, onScanError);
+}
+
+// QR Code Error Handler
+function onScanError(error) {
+    console.warn('Scan error:', error);
+    if (error.includes('NotFound')) {
+        showError('រកមិនឃើញកាមេរ៉ា។ សូមពិនិត្យមើលការតភ្ជាប់របស់អ្នក។');
+    }
+}
 
         // Start Scanner
         html5QrcodeScanner.render(onScanSuccess, onScanError);
